@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RankEmblem } from "@/components/rank-badge";
-import { RANKS } from "@/data/ranks";
+import { SHOWCASE_RANK } from "@/data/ranks";
 import { useGymStore } from "@/lib/store";
 import type { Sex } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -27,7 +27,7 @@ export function Onboarding() {
     <div className="flex min-h-dvh w-full justify-center bg-background">
       <div className="flex w-full max-w-md flex-col justify-center gap-8 px-6 py-10">
         <div className="stagger-in flex flex-col items-center text-center">
-          <RankEmblem rank={RANKS[4]} size={96} />
+          <RankEmblem rank={SHOWCASE_RANK} size={96} />
           <p className="mt-6 font-display text-sm tracking-widest text-muted-foreground">
             IRON RANK
           </p>

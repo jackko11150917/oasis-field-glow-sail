@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Check, Minus, Plus, Search, Trash2, X } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import { RankEmblem } from "@/components/rank-badge";
+import { ExerciseIcon } from "@/components/exercise-icon";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
@@ -13,7 +14,7 @@ import {
   getExercise,
   type MuscleGroup,
 } from "@/data/exercises";
-import { RANKS } from "@/data/ranks";
+import { rankForLevel, SHOWCASE_RANK } from "@/data/ranks";
 import { completedSetCount, loadKindHint, workoutVolume } from "@/lib/stats";
 import { useGymStore } from "@/lib/store";
 import type { WorkoutSummary } from "@/lib/types";
@@ -65,9 +66,16 @@ function TemplatePicker() {
             onClick={() => startTemplate(t.id)}
             className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-4 text-left transition-colors duration-150 hover:bg-elevated"
           >
-            <div>
-              <p className="font-medium">{t.name}</p>
-              <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex -space-x-2">
+                {t.exerciseIds.slice(0, 3).map((id) => (
+                  <ExerciseIcon key={id} id={id} size={32} className="ring-2 ring-card" />
+                ))}
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium">{t.name}</p>
+                <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+              </div>
             </div>
             <span className="text-xs tabular-nums text-subtle">{t.exerciseIds.length} 項</span>
           </button>
@@ -136,11 +144,14 @@ function Logger() {
           return (
             <section key={block.exerciseId} className="min-w-0 rounded-xl border border-border bg-card p-3">
               <div className="mb-2 flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-medium">{ex.nameZh}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {loadKindHint(ex.loadKind)} · {MUSCLE_LABELS[ex.muscle]}
-                  </p>
+                <div className="flex min-w-0 items-start gap-2.5">
+                  <ExerciseIcon id={ex.id} size={36} />
+                  <div>
+                    <p className="font-medium">{ex.nameZh}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {loadKindHint(ex.loadKind)} · {MUSCLE_LABELS[ex.muscle]}
+                    </p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-1">
                   <Link
@@ -365,9 +376,10 @@ function ExercisePicker({
               key={e.id}
               type="button"
               onClick={() => onPick(e.id)}
-              className="flex w-full items-center justify-between border-b border-border py-3 text-left last:border-0"
+              className="flex w-full items-center gap-3 border-b border-border py-3 text-left last:border-0"
             >
-              <span>
+              <ExerciseIcon id={e.id} size={36} />
+              <span className="min-w-0 flex-1">
                 <span className="block text-sm font-medium">{e.nameZh}</span>
                 <span className="text-xs text-muted-foreground">
                   {MUSCLE_LABELS[e.muscle]} · {EQUIPMENT_LABELS[e.equipment]}
@@ -415,9 +427,7 @@ function SummaryView({
   summary: WorkoutSummary;
   onDone: () => void;
 }) {
-  const rank = summary.leveledUpTo
-    ? RANKS[Math.min(RANKS.length - 1, Math.max(0, Math.floor(summary.leveledUpTo / 5)))]
-    : RANKS[4];
+  const rank = summary.leveledUpTo ? rankForLevel(summary.leveledUpTo) : SHOWCASE_RANK;
 
   return (
     <div className="summary-screen flex flex-col items-center justify-center px-6 text-center">

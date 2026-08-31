@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { RankEmblem } from "@/components/rank-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RANKS } from "@/data/ranks";
+import { SHOWCASE_RANK } from "@/data/ranks";
 import {
   GROK_PROVIDERS,
   authClient,
@@ -58,7 +58,7 @@ function Login() {
   return (
     <main className="flex min-h-dvh flex-col justify-center px-6 py-8">
       <div className="flex flex-col items-center text-center">
-        <RankEmblem rank={RANKS[4]} size={72} />
+        <RankEmblem rank={SHOWCASE_RANK} size={72} />
         <p className="mt-4 font-display text-sm tracking-widest text-muted-foreground">
           IRON RANK
         </p>

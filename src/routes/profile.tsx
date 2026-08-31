@@ -95,8 +95,8 @@ function ProfileInner() {
       <section className="mt-10 rounded-xl border border-border bg-card p-4">
         <h2 className="text-sm font-medium">關於段位</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          段位唔係即時線上榜，而係用你嘅估計 1RM 同體重比例，對照典型健身人口分布。白金大約係全球前
-          40%（Top 40%）。登入後訓練資料會存到雲端，換機都可以繼續。
+          段位按估計 1RM 同體重比例對照典型健身人口。黑鐵至鑽石各分 3、2、1（1
+          最高），之後係大師同宗師。白金大約係全球前 40%。登入後訓練資料會存到雲端。
         </p>
       </section>
 

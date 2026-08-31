@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
+import { ExerciseIcon } from "@/components/exercise-icon";
 import { RankChip, RankEmblem } from "@/components/rank-badge";
 import { Button } from "@/components/ui/button";
 import { EQUIPMENT_LABELS, getExercise, MUSCLE_LABELS } from "@/data/exercises";
@@ -48,12 +49,17 @@ function GuideDetail() {
         指導
       </Link>
 
-      <p className="mt-2 text-xs tracking-widest text-muted-foreground">{exercise.nameEn}</p>
-      <h1 className="font-display text-4xl tracking-wide">{exercise.nameZh}</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        {MUSCLE_LABELS[exercise.muscle]} · {EQUIPMENT_LABELS[exercise.equipment]} ·{" "}
-        {loadKindHint(exercise.loadKind)}
-      </p>
+      <div className="mt-3 flex items-start gap-4">
+        <ExerciseIcon id={exercise.id} size={72} />
+        <div className="min-w-0">
+          <p className="text-xs tracking-widest text-muted-foreground">{exercise.nameEn}</p>
+          <h1 className="font-display text-4xl tracking-wide">{exercise.nameZh}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {MUSCLE_LABELS[exercise.muscle]} · {EQUIPMENT_LABELS[exercise.equipment]} ·{" "}
+            {loadKindHint(exercise.loadKind)}
+          </p>
+        </div>
+      </div>
       <p className="mt-3 text-sm">{exercise.summary}</p>
 
       {ranked.rank.id !== UNRANKED.id ? (

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ExerciseIcon } from "@/components/exercise-icon";
 import { Input } from "@/components/ui/input";
 import {
   EQUIPMENT_LABELS,
@@ -61,30 +62,35 @@ function GuideInner() {
         ))}
       </div>
 
-      <ul className="mt-4 space-y-2">
+      <p className="mt-3 text-xs text-subtle">{list.length} 個動作</p>
+
+      <ul className="mt-3 space-y-2">
         {list.map((e) => (
           <li key={e.id}>
             <Link
               to="/guide/$id"
               params={{ id: e.id }}
-              className="block rounded-xl border border-border bg-card p-4 transition-colors duration-150 hover:bg-elevated"
+              className="flex items-start gap-3 rounded-xl border border-border bg-card p-3 transition-colors duration-150 hover:bg-elevated"
             >
-              <div className="flex min-w-0 items-baseline justify-between gap-2">
-                <p className="min-w-0 truncate font-medium">{e.nameZh}</p>
-                <p className="shrink-0 text-xs text-subtle">
-                  {MUSCLE_LABELS[e.muscle]} · {EQUIPMENT_LABELS[e.equipment]}
-                </p>
-              </div>
-              <p className="mt-1 text-sm text-muted-foreground">{e.summary}</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {e.cues.slice(0, 4).map((c) => (
-                  <span
-                    key={c}
-                    className="rounded-full border border-border px-2 py-0.5 text-xs text-accent"
-                  >
-                    {c}
-                  </span>
-                ))}
+              <ExerciseIcon id={e.id} size={48} className="mt-0.5" />
+              <div className="min-w-0 flex-1">
+                <div className="flex min-w-0 items-baseline justify-between gap-2">
+                  <p className="min-w-0 truncate font-medium">{e.nameZh}</p>
+                  <p className="shrink-0 text-xs text-subtle">
+                    {MUSCLE_LABELS[e.muscle]} · {EQUIPMENT_LABELS[e.equipment]}
+                  </p>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">{e.summary}</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {e.cues.slice(0, 4).map((c) => (
+                    <span
+                      key={c}
+                      className="rounded-full border border-border px-2 py-0.5 text-xs text-accent"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
               </div>
             </Link>
           </li>

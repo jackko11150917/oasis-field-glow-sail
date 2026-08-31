@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { RankChip, RankEmblem } from "@/components/rank-badge";
+import { RankEmblem } from "@/components/rank-badge";
+import { ExerciseIcon } from "@/components/exercise-icon";
 import { Progress } from "@/components/ui/progress";
 import { EXERCISES, MUSCLE_LABELS } from "@/data/exercises";
-import { RANKS, UNRANKED } from "@/data/ranks";
+import { TIER_GROUPS, UNRANKED } from "@/data/ranks";
 import { bestSets, overallRank, rankExercise } from "@/lib/stats";
 import { useGymStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/rank")({ component: RankPage });
 
@@ -59,21 +61,51 @@ function RankInner() {
 
       <section className="mt-6">
         <h2 className="text-sm font-medium">段位一覽</h2>
-        <ul className="mt-2 grid grid-cols-2 gap-2">
-          {RANKS.map((r) => (
-            <li
-              key={r.id}
-              className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2"
-            >
-              <RankEmblem rank={r} size={36} />
-              <div>
-                <p className="text-sm">{r.nameZh}</p>
-                <p className="text-xs text-subtle">
-                  {r.min === 0 ? "起步" : `超過 ${r.min}% 起`}
-                </p>
-              </div>
-            </li>
-          ))}
+        <p className="mt-1 text-xs text-subtle">
+          黑鐵至鑽石各分 3、2、1，1 為該階最高。大師同宗師無分段。
+        </p>
+        <ul className="mt-3 space-y-2">
+          {TIER_GROUPS.map((g) => {
+            const active = overall.rank.id !== UNRANKED.id && overall.rank.tier === g.tier;
+            return (
+              <li
+                key={g.tier}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl border bg-card px-3 py-2.5",
+                  active ? "border-accent/40" : "border-border",
+                )}
+              >
+                <RankEmblem rank={g.emblem} size={48} />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">{g.nameZh}</p>
+                  <p className="text-xs tracking-widest text-subtle">{g.nameEn}</p>
+                </div>
+                {g.ranks.length > 1 ? (
+                  <div className="flex gap-1">
+                    {g.ranks.map((r) => {
+                      const on = overall.rank.id === r.id;
+                      return (
+                        <span
+                          key={r.id}
+                          className={cn(
+                            "flex size-8 items-center justify-center rounded-md text-xs tabular-nums",
+                            on
+                              ? "bg-accent text-accent-foreground"
+                              : "bg-elevated text-muted-foreground",
+                          )}
+                          title={r.nameZh}
+                        >
+                          {r.division}
+                        </span>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <span className="text-xs text-subtle">超過 {g.min}%</span>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </section>
 
@@ -91,7 +123,7 @@ function RankInner() {
                 params={{ id: row.exercise.id }}
                 className="flex min-w-0 items-center gap-3 rounded-xl border border-border bg-card px-3 py-3"
               >
-                <RankEmblem rank={row.rank.id === UNRANKED.id ? RANKS[0] : row.rank} size={44} />
+                <ExerciseIcon id={row.exercise.id} size={40} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{row.exercise.nameZh}</p>
                   <p className="text-xs text-muted-foreground">
@@ -105,7 +137,15 @@ function RankInner() {
                   ) : null}
                 </div>
                 {row.best ? (
-                  <RankChip rank={row.rank} percentile={row.percentile} />
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <RankEmblem rank={row.rank} size={40} />
+                    <span
+                      className="text-xs font-medium"
+                      style={{ color: `var(--color-${row.rank.token})` }}
+                    >
+                      {row.rank.nameZh}
+                    </span>
+                  </div>
                 ) : (
                   <span className="text-xs text-subtle">未定級</span>
                 )}
