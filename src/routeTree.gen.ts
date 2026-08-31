@@ -16,6 +16,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RankRouteImport } from './routes/rank'
 import { Route as TrainRouteImport } from './routes/train'
+import { Route as FriendsRouteImport } from './routes/friends'
+import { Route as FriendsCodeRouteImport } from './routes/friends.$code'
 import { Route as GuideIdRouteImport } from './routes/guide.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -54,6 +56,16 @@ const TrainRoute = TrainRouteImport.update({
   path: '/train',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FriendsRoute = FriendsRouteImport.update({
+  id: '/friends',
+  path: '/friends',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FriendsCodeRoute = FriendsCodeRouteImport.update({
+  id: '/friends/$code',
+  path: '/friends/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GuideIdRoute = GuideIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -73,6 +85,8 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/rank': typeof RankRoute
   '/train': typeof TrainRoute
+  '/friends': typeof FriendsRoute
+  '/friends/$code': typeof FriendsCodeRoute
   '/guide/$id': typeof GuideIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -84,6 +98,8 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/rank': typeof RankRoute
   '/train': typeof TrainRoute
+  '/friends': typeof FriendsRoute
+  '/friends/$code': typeof FriendsCodeRoute
   '/guide/$id': typeof GuideIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -96,6 +112,8 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/rank': typeof RankRoute
   '/train': typeof TrainRoute
+  '/friends': typeof FriendsRoute
+  '/friends/$code': typeof FriendsCodeRoute
   '/guide/$id': typeof GuideIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -109,6 +127,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rank'
     | '/train'
+    | '/friends'
+    | '/friends/$code'
     | '/guide/$id'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +140,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rank'
     | '/train'
+    | '/friends'
+    | '/friends/$code'
     | '/guide/$id'
     | '/api/auth/$'
   id:
@@ -131,6 +153,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rank'
     | '/train'
+    | '/friends'
+    | '/friends/$code'
     | '/guide/$id'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
@@ -143,6 +167,8 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RankRoute: typeof RankRoute
   TrainRoute: typeof TrainRoute
+  FriendsRoute: typeof FriendsRoute
+  FriendsCodeRoute: typeof FriendsCodeRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -197,6 +223,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrainRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/friends': {
+      id: '/friends'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof FriendsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/friends/$code': {
+      id: '/friends/$code'
+      path: '/friends/$code'
+      fullPath: '/friends/$code'
+      preLoaderRoute: typeof FriendsCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/guide/$id': {
       id: '/guide/$id'
       path: '/$id'
@@ -232,6 +272,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RankRoute: RankRoute,
   TrainRoute: TrainRoute,
+  FriendsRoute: FriendsRoute,
+  FriendsCodeRoute: FriendsCodeRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
