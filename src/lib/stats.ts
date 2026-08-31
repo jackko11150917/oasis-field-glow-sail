@@ -8,8 +8,8 @@ import {
   UNRANKED,
   type RankDef,
 } from "@/data/ranks";
-import type { Profile, SetLog, Workout } from "@/lib/types";
-import { e1rm } from "@/lib/xp";
+import type { ActiveSession, Profile, SetLog, Workout } from "@/lib/types";
+import { e1rm, progressFromXp } from "@/lib/xp";
 import { localISODate } from "@/lib/utils";
 
 export type BestSet = {
@@ -228,4 +228,57 @@ export function loadKindHint(kind: LoadKind): string {
   if (kind === "bodyweight") return "額外負重，徒手填 0";
   if (kind === "stack") return "配重片標示";
   return "槓鈴含槓";
+}
+
+
+export function weekStartISO(from = localISODate()): string {
+  const [y, m, d] = from.split("-").map(Number);
+  const date = new Date(y, (m ?? 1) - 1, d ?? 1);
+  const day = date.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  return shiftBack(from, diff);
+}
+
+export function trainedDaysThisWeek(workouts: Workout[], from = localISODate()): number {
+  const start = weekStartISO(from);
+  const days = new Set<string>();
+  for (const w of workouts) {
+    const day = localISODate(new Date(w.finishedAt));
+    if (day >= start && day <= from) days.add(day);
+  }
+  return days.size;
+}
+
+export function xpThisWeek(workouts: Workout[], from = localISODate()): number {
+  const start = weekStartISO(from);
+  let xp = 0;
+  for (const w of workouts) {
+    const day = localISODate(new Date(w.finishedAt));
+    if (day >= start && day <= from) xp += w.xpEarned;
+  }
+  return xp;
+}
+
+export function buildPublicStats(
+  workouts: Workout[],
+  profile: Profile,
+  xp: number,
+  session: ActiveSession | null,
+) {
+  const overall = overallRank(workouts, profile);
+  let lastTrainedAt: string | null = null;
+  for (const w of workouts) {
+    if (!lastTrainedAt || w.finishedAt > lastTrainedAt) lastTrainedAt = w.finishedAt;
+  }
+  return {
+    level: progressFromXp(xp).level,
+    rankId: overall.rank.id,
+    rankPercentile: overall.percentile,
+    streak: computeStreak(workouts),
+    weekDays: trainedDaysThisWeek(workouts),
+    weekXp: xpThisWeek(workouts),
+    workoutCount: workouts.length,
+    lastTrainedAt,
+    trainingNow: Boolean(session),
+  };
 }

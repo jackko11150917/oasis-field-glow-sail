@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Flame, Settings, Swords } from "lucide-react";
+import { Flame, Settings, Swords, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { PlayerAvatar } from "@/components/player-avatar";
 import { RankEmblem } from "@/components/rank-badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { overallRank, trainedDays, lastNDates, computeStreak } from "@/lib/stats";
+import { loadFriendsHome, type FriendsHome } from "@/lib/friends-api";
+import { overallRank, trainedDays, lastNDates, computeStreak, trainedDaysThisWeek } from "@/lib/stats";
 import { useGymStore } from "@/lib/store";
 import { cn, localISODate } from "@/lib/utils";
 import { progressFromXp, titleForLevel } from "@/lib/xp";
@@ -19,32 +22,86 @@ function HomeInner() {
   const xp = useGymStore((s) => s.xp);
   const workouts = useGymStore((s) => s.workouts);
   const session = useGymStore((s) => s.session);
+  const friendCode = useGymStore((s) => s.friendCode);
   const { level, into, need } = progressFromXp(xp);
   const overall = overallRank(workouts, profile);
   const streak = computeStreak(workouts);
+  const weekDays = trainedDaysThisWeek(workouts);
   const today = localISODate();
   const trainedToday = workouts.some((w) => localISODate(new Date(w.finishedAt)) === today);
   const days = trainedDays(workouts);
   const grid = lastNDates(28);
   const recent = [...workouts].slice(-3).reverse();
+  const [social, setSocial] = useState<FriendsHome | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadFriendsHome()
+      .then((data) => {
+        if (cancelled) return;
+        setSocial(data);
+        if (data.me?.friendCode) {
+          useGymStore.getState().setFriendCode(data.me.friendCode);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const pending = social?.incoming.length ?? 0;
+  const topSquad = social
+    ? [social.me, ...social.friends]
+        .filter((x): x is NonNullable<typeof x> => Boolean(x))
+        .sort((a, b) => b.weekDays - a.weekDays || b.weekXp - a.weekXp)
+        .slice(0, 3)
+    : [];
 
   return (
     <div className="px-5 pt-6">
       <header className="flex items-start justify-between">
-        <div>
-          <p className="text-xs tracking-widest text-muted-foreground">IRON RANK</p>
-          <h1 className="mt-1 max-w-[16rem] truncate text-2xl font-medium">{profile.name}</h1>
+        <div className="flex min-w-0 items-center gap-3">
+          <Link to="/profile" aria-label="檔案">
+            <PlayerAvatar avatarId={profile.avatarId || "anvil"} size={48} trainingNow={Boolean(session)} />
+          </Link>
+          <div className="min-w-0">
+            <p className="text-xs tracking-widest text-muted-foreground">IRON RANK</p>
+            <h1 className="mt-0.5 max-w-[12rem] truncate text-2xl font-medium">{profile.name}</h1>
+            {friendCode ? (
+              <p className="font-mono text-xs tracking-wide text-subtle">{friendCode}</p>
+            ) : null}
+          </div>
         </div>
-        <Link
-          to="/profile"
-          className="flex size-11 items-center justify-center rounded-md text-muted-foreground hover:bg-elevated"
-          aria-label="設定"
-        >
-          <Settings className="size-5" />
-        </Link>
+        <div className="flex items-center">
+          <Link
+            to="/friends"
+            className="relative flex size-11 items-center justify-center rounded-md text-muted-foreground hover:bg-elevated"
+            aria-label="好友"
+          >
+            <Users className="size-5" />
+            {pending > 0 ? (
+              <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-accent" />
+            ) : null}
+          </Link>
+          <Link
+            to="/profile"
+            className="flex size-11 items-center justify-center rounded-md text-muted-foreground hover:bg-elevated"
+            aria-label="設定"
+          >
+            <Settings className="size-5" />
+          </Link>
+        </div>
       </header>
 
       <div className="mt-6 space-y-4">
+
+        {social && social.cheersReceived > 0 ? (
+          <p className="rounded-lg border border-border bg-elevated px-3 py-2 text-sm">
+            本週有 {social.cheersReceived} 位戰友為你打氣
+          </p>
+        ) : null}
+
         <section className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-end justify-between gap-3">
             <div>
@@ -53,10 +110,13 @@ function HomeInner() {
               </p>
               <p className="mt-1 text-sm text-muted-foreground">{titleForLevel(level)}</p>
             </div>
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Flame className="size-4 text-accent" />
-              <span className="tabular-nums">{streak}</span>
-              <span>日連續</span>
+            <div className="flex flex-col items-end gap-1 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <Flame className="size-4 text-accent" />
+                <span className="tabular-nums">{streak}</span>
+                <span>日連續</span>
+              </span>
+              <span className="text-xs">本週 {weekDays} 日</span>
             </div>
           </div>
           <div className="mt-4">
@@ -89,6 +149,38 @@ function HomeInner() {
               <p className="mt-1 text-sm text-muted-foreground">完成訓練即可解鎖段位</p>
             )}
           </div>
+        </Link>
+
+
+        <Link
+          to="/friends"
+          className="block rounded-xl border border-border bg-card p-4 transition-colors duration-150 hover:bg-elevated"
+        >
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-sm font-medium">戰隊</h2>
+            <span className="text-xs text-accent">
+              {pending > 0 ? `${pending} 個邀請` : "好友"}
+            </span>
+          </div>
+          {topSquad.length > 1 ? (
+            <ul className="space-y-2">
+              {topSquad.map((card, i) => (
+                <li key={card.friendCode} className="flex items-center gap-2 text-sm">
+                  <span className="w-4 text-xs tabular-nums text-subtle">{i + 1}</span>
+                  <PlayerAvatar avatarId={card.avatarId} size={28} trainingNow={card.trainingNow} />
+                  <span className="min-w-0 flex-1 truncate">
+                    {card.name}
+                    {card.isSelf ? "（你）" : ""}
+                  </span>
+                  <span className="text-xs text-muted-foreground">本週 {card.weekDays} 日</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              加入好友，一齊睇邊個更勤力。你嘅 ID：{friendCode ?? "同步中"}
+            </p>
+          )}
         </Link>
 
         <section className="rounded-xl border border-border bg-card p-4">

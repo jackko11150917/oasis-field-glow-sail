@@ -1,17 +1,21 @@
 import { useState } from "react";
+import { AvatarPicker } from "@/components/avatar-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RankEmblem } from "@/components/rank-badge";
+import { DEFAULT_AVATAR_ID } from "@/data/avatars";
 import { SHOWCASE_RANK } from "@/data/ranks";
 import { useGymStore } from "@/lib/store";
 import type { Sex } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { APP_VERSION_LABEL } from "@/lib/version";
 
 export function Onboarding() {
   const setProfile = useGymStore((s) => s.setProfile);
   const [name, setName] = useState("");
   const [sex, setSex] = useState<Sex>("male");
   const [bw, setBw] = useState("70");
+  const [avatarId, setAvatarId] = useState(DEFAULT_AVATAR_ID);
 
   function submit() {
     const bodyweight = Math.max(30, Math.min(250, Number(bw) || 70));
@@ -19,6 +23,7 @@ export function Onboarding() {
       name: name.trim() || "鍛造者",
       sex,
       bodyweight,
+      avatarId,
       onboarded: true,
     });
   }
@@ -44,6 +49,11 @@ export function Onboarding() {
             submit();
           }}
         >
+          <div className="flex flex-col gap-2 text-sm">
+            <span className="text-muted-foreground">頭像</span>
+            <AvatarPicker value={avatarId} onChange={setAvatarId} />
+          </div>
+
           <label className="flex flex-col gap-2 text-sm">
             <span className="text-muted-foreground">稱呼</span>
             <Input
@@ -95,6 +105,7 @@ export function Onboarding() {
           <p className="text-center text-xs text-subtle">
             段位按體重比例估算全球百分位。登入後資料會存到你嘅帳號。
           </p>
+          <p className="text-center text-xs text-subtle">{APP_VERSION_LABEL}</p>
         </form>
       </div>
     </div>

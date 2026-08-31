@@ -34,6 +34,7 @@ export type Profile = {
   sex: Sex;
   bodyweight: number;
   onboarded: boolean;
+  avatarId: string;
 };
 
 export type WorkoutSummary = {
@@ -43,4 +44,16 @@ export type WorkoutSummary = {
   prs: string[];
   leveledUpTo: number | null;
   streak: number;
+};
+
+export type PublicStats = {
+  level: number;
+  rankId: string;
+  rankPercentile: number;
+  streak: number;
+  weekDays: number;
+  weekXp: number;
+  workoutCount: number;
+  lastTrainedAt: string | null;
+  trainingNow: boolean;
 };

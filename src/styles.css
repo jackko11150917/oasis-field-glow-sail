@@ -167,3 +167,24 @@
     transform: none !important;
   }
 }
+
+
+@keyframes train-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-success) 55%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in oklab, var(--color-success) 0%, transparent);
+  }
+}
+
+.avatar-live {
+  animation: train-pulse 1.8s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-live {
+    animation: none;
+  }
+}

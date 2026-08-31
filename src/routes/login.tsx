@@ -4,6 +4,7 @@ import { RankEmblem } from "@/components/rank-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SHOWCASE_RANK } from "@/data/ranks";
+import { APP_VERSION_LABEL } from "@/lib/version";
 import {
   GROK_PROVIDERS,
   authClient,
@@ -140,6 +141,7 @@ function Login() {
           ))}
         </div>
       ) : null}
+      <p className="mt-8 text-center text-xs text-subtle">{APP_VERSION_LABEL}</p>
     </main>
   );
 }

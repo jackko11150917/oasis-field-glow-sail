@@ -232,3 +232,8 @@ export function rankForLevel(level: number): RankDef {
   const i = Math.min(RANKS.length - 1, Math.max(0, Math.floor(Math.max(1, level) / 3)));
   return RANKS[i];
 }
+
+export function rankById(id: string | null | undefined): RankDef {
+  if (!id) return UNRANKED;
+  return RANKS.find((r) => r.id === id) ?? UNRANKED;
+}

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { getExercise, TEMPLATES } from "@/data/exercises";
+import { DEFAULT_AVATAR_ID } from "@/data/avatars";
 import { completedSetCount, lastSetsFor, workoutVolume } from "@/lib/stats";
 import type {
   ActiveSession,
@@ -20,7 +21,9 @@ type GymState = {
   workouts: Workout[];
   session: ActiveSession | null;
   lastSummary: WorkoutSummary | null;
+  friendCode: string | null;
   setProfile: (patch: Partial<Profile>) => void;
+  setFriendCode: (code: string | null) => void;
   startSession: (name: string, exerciseIds?: string[]) => void;
   startTemplate: (templateId: string) => void;
   discardSession: () => void;
@@ -39,6 +42,7 @@ const defaultProfile: Profile = {
   sex: "male",
   bodyweight: 70,
   onboarded: false,
+  avatarId: DEFAULT_AVATAR_ID,
 };
 
 function emptySet(weight = 20, reps = 8): SetLog {
@@ -125,10 +129,12 @@ export const useGymStore = create<GymState>()(
       workouts: [],
       session: null,
       lastSummary: null,
+      friendCode: null,
       setProfile: (patch) => {
         set((s) => ({ profile: { ...s.profile, ...patch } }));
         bumpCloud();
       },
+      setFriendCode: (code) => set({ friendCode: code }),
       startSession: (name, exerciseIds = []) => {
         const workouts = get().workouts;
         const exercises: WorkoutExercise[] = exerciseIds.map((id) => ({
@@ -296,11 +302,25 @@ export const useGymStore = create<GymState>()(
           workouts: [],
           session: null,
           lastSummary: null,
+          friendCode: null,
         });
         void import("@/lib/sync").then((m) => m.wipeCloud());
       },
     }),
-    { name: "iron-rank-v1", skipHydration: true },
+    {
+      name: "iron-rank-v1",
+      skipHydration: true,
+      merge: (persisted, current) => {
+        const p = persisted as Partial<GymState> | undefined;
+        if (!p) return current;
+        return {
+          ...current,
+          ...p,
+          profile: { ...defaultProfile, ...p.profile },
+          friendCode: p.friendCode ?? current.friendCode ?? null,
+        };
+      },
+    },
   ),
 );
 
