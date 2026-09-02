@@ -174,7 +174,7 @@ function HomeInner() {
                   <span className="w-4 text-xs tabular-nums text-subtle">{i + 1}</span>
                   <PlayerAvatar
                     avatarId={card.avatarId}
-                    avatarUrl={card.isSelf ? profile.avatarUrl : undefined}
+                    avatarUrl={card.isSelf ? profile.avatarUrl || card.avatarUrl : card.avatarUrl}
                     size={28}
                     trainingNow={card.trainingNow}
                   />
