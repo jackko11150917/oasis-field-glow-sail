@@ -22,7 +22,7 @@ export function FriendRow({
       params={{ code: card.friendCode }}
       className="flex min-w-0 items-center gap-3 rounded-xl border border-border bg-card px-3 py-3 transition-colors duration-150 hover:bg-elevated"
     >
-      <PlayerAvatar avatarId={card.avatarId} size={48} trainingNow={card.trainingNow} />
+      <PlayerAvatar avatarId={card.avatarId} avatarUrl={card.avatarUrl} size={48} trainingNow={card.trainingNow} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{card.name}</p>
         <p className="font-mono text-xs tracking-wide text-subtle">{card.friendCode}</p>

@@ -3,17 +3,38 @@ import { cn } from "@/lib/utils";
 
 export function PlayerAvatar({
   avatarId,
+  avatarUrl,
   size = 48,
   trainingNow = false,
   className,
 }: {
-  avatarId: string;
+  avatarId?: string;
+  avatarUrl?: string | null;
   size?: number;
   trainingNow?: boolean;
   className?: string;
 }) {
   const avatar = getAvatar(avatarId);
   const color = `var(--color-${avatar.token})`;
+
+  if (avatarUrl) {
+    return (
+      <span
+        className={cn(
+          "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-border",
+          trainingNow && "avatar-live",
+          className,
+        )}
+        style={{ width: size, height: size }}
+      >
+        <img src={avatarUrl} alt="" className="size-full object-cover" />
+        {trainingNow ? (
+          <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-background bg-success" />
+        ) : null}
+      </span>
+    );
+  }
+
   return (
     <span
       className={cn(
