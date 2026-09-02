@@ -1,12 +1,8 @@
 import { EXERCISES, EXERCISE_MAP, type Exercise } from "./exercises";
 import { MACHINE_EXERCISES } from "./machine-exercises";
 
-let registered = false;
-
-/** 合併額外器械動作進 EXERCISES / EXERCISE_MAP（模組載入時呼叫一次） */
+/** 合併額外器械動作進 EXERCISES / EXERCISE_MAP */
 export function ensureMachinesRegistered(): void {
-  if (registered) return;
-  registered = true;
   for (const e of MACHINE_EXERCISES as unknown as Exercise[]) {
     if (EXERCISE_MAP[e.id]) continue;
     EXERCISES.push(e);
@@ -14,4 +10,5 @@ export function ensureMachinesRegistered(): void {
   }
 }
 
+// 模組一 load 就註冊，避免 tree-shake 掉 side-effect
 ensureMachinesRegistered();
