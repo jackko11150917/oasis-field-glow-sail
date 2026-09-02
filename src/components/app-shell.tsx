@@ -9,6 +9,7 @@ import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { rehydrateGym, useGymStore } from "@/lib/store";
 import { pullCloudState } from "@/lib/sync";
 import { cn } from "@/lib/utils";
+import "@/data/register-machines";
 
 const TABS = [
   { to: "/", label: "主頁", icon: House },
