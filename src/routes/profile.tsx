@@ -29,7 +29,7 @@ function ProfileInner() {
   const [name, setName] = useState(profile.name);
   const [bw, setBw] = useState(String(profile.bodyweight));
   const [sex, setSex] = useState<Sex>(profile.sex);
-  const [avatarId, setAvatarId] = useState(profile.avatarId || "anvil");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatarUrl || null);
   const [saved, setSaved] = useState(false);
   const level = progressFromXp(xp).level;
 
@@ -38,7 +38,8 @@ function ProfileInner() {
       name: name.trim() || profile.name,
       bodyweight: Math.max(30, Math.min(250, Number(bw) || profile.bodyweight)),
       sex,
-      avatarId,
+      avatarId: profile.avatarId || "custom",
+      avatarUrl: avatarUrl || undefined,
     });
     setSaved(true);
     window.setTimeout(() => setSaved(false), 1600);
@@ -61,7 +62,7 @@ function ProfileInner() {
         主頁
       </Link>
       <div className="mt-2 flex items-center gap-3">
-        <PlayerAvatar avatarId={avatarId} size={64} />
+        <PlayerAvatar avatarId={profile.avatarId} avatarUrl={avatarUrl} size={64} />
         <div>
           <h1 className="font-display text-4xl tracking-wide">檔案</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -97,7 +98,7 @@ function ProfileInner() {
       <div className="mt-6 flex flex-col gap-4">
         <div className="flex flex-col gap-2 text-sm">
           <span className="text-muted-foreground">頭像</span>
-          <AvatarPicker value={avatarId} onChange={setAvatarId} />
+          <AvatarPicker value={avatarUrl} onChange={setAvatarUrl} />
         </div>
         <label className="flex flex-col gap-2 text-sm">
           <span className="text-muted-foreground">稱呼</span>
@@ -153,7 +154,7 @@ function ProfileInner() {
         清除所有資料
       </Button>
 
-      <p className="mt-8 text-center text-xs text-subtle">鐵階 IRON RANK · {APP_VERSION_LABEL}</p>
+      <p className="mt-8 text-center text-xs text-subtle">gym撚天地 · {APP_VERSION_LABEL}</p>
     </div>
   );
 }

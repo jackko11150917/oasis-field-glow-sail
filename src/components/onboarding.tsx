@@ -3,7 +3,6 @@ import { AvatarPicker } from "@/components/avatar-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RankEmblem } from "@/components/rank-badge";
-import { DEFAULT_AVATAR_ID } from "@/data/avatars";
 import { SHOWCASE_RANK } from "@/data/ranks";
 import { useGymStore } from "@/lib/store";
 import type { Sex } from "@/lib/types";
@@ -15,7 +14,7 @@ export function Onboarding() {
   const [name, setName] = useState("");
   const [sex, setSex] = useState<Sex>("male");
   const [bw, setBw] = useState("70");
-  const [avatarId, setAvatarId] = useState(DEFAULT_AVATAR_ID);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   function submit() {
     const bodyweight = Math.max(30, Math.min(250, Number(bw) || 70));
@@ -23,7 +22,8 @@ export function Onboarding() {
       name: name.trim() || "鍛造者",
       sex,
       bodyweight,
-      avatarId,
+      avatarId: "custom",
+      avatarUrl: avatarUrl || undefined,
       onboarded: true,
     });
   }
@@ -34,9 +34,9 @@ export function Onboarding() {
         <div className="stagger-in flex flex-col items-center text-center">
           <RankEmblem rank={SHOWCASE_RANK} size={96} />
           <p className="mt-6 font-display text-sm tracking-widest text-muted-foreground">
-            IRON RANK
+            GYM
           </p>
-          <h1 className="mt-1 font-display text-5xl tracking-wide">鐵階</h1>
+          <h1 className="mt-1 font-display text-5xl tracking-wide">gym撚天地</h1>
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
             每次訓練換經驗、升等級。動作有指導，重量有段位。
           </p>
@@ -51,7 +51,7 @@ export function Onboarding() {
         >
           <div className="flex flex-col gap-2 text-sm">
             <span className="text-muted-foreground">頭像</span>
-            <AvatarPicker value={avatarId} onChange={setAvatarId} />
+            <AvatarPicker value={avatarUrl} onChange={setAvatarUrl} />
           </div>
 
           <label className="flex flex-col gap-2 text-sm">

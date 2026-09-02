@@ -50,7 +50,7 @@ function GuideDetail() {
       </Link>
 
       <div className="mt-3 flex items-start gap-4">
-        <ExerciseIcon id={exercise.id} size={72} />
+        <ExerciseIcon id={exercise.id} size={72} editable />
         <div className="min-w-0">
           <p className="text-xs tracking-widest text-muted-foreground">{exercise.nameEn}</p>
           <h1 className="font-display text-4xl tracking-wide">{exercise.nameZh}</h1>
@@ -61,6 +61,7 @@ function GuideDetail() {
         </div>
       </div>
       <p className="mt-3 text-sm">{exercise.summary}</p>
+      <p className="mt-1 text-xs text-subtle">長按／撳動作圖示可以上傳自己嘅圖</p>
 
       {ranked.rank.id !== UNRANKED.id ? (
         <div className="mt-5 flex items-center gap-3 rounded-xl border border-border bg-card p-3">
