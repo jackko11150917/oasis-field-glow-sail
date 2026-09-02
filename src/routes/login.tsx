@@ -61,9 +61,9 @@ function Login() {
       <div className="flex flex-col items-center text-center">
         <RankEmblem rank={SHOWCASE_RANK} size={72} />
         <p className="mt-4 font-display text-sm tracking-widest text-muted-foreground">
-          IRON RANK
+          GYM
         </p>
-        <h1 className="mt-1 font-display text-4xl tracking-wide">鐵階</h1>
+        <h1 className="mt-1 font-display text-4xl tracking-wide">gym撚天地</h1>
         <p className="mt-2 max-w-xs text-sm text-muted-foreground">
           用電郵登入，訓練紀錄同段位會跟住你，換機都唔會唔見。
         </p>
