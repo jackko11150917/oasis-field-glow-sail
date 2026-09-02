@@ -122,7 +122,12 @@ function FriendsInner() {
         <p className="text-xs text-muted-foreground">你嘅好友 ID</p>
         <div className="mt-2 flex items-center gap-3">
           {me ? (
-            <PlayerAvatar avatarId={me.avatarId} avatarUrl={myAvatarUrl} size={52} trainingNow={me.trainingNow} />
+            <PlayerAvatar
+              avatarId={me.avatarId}
+              avatarUrl={myAvatarUrl || me.avatarUrl}
+              size={52}
+              trainingNow={me.trainingNow}
+            />
           ) : (
             <div className="size-12 rounded-full bg-elevated" />
           )}
@@ -155,7 +160,7 @@ function FriendsInner() {
               <ul className="mt-2 space-y-2">
                 {home.incoming.map((req) => (
                   <li key={req.id} className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-3">
-                    <PlayerAvatar avatarId={req.avatarId} size={44} />
+                    <PlayerAvatar avatarId={req.avatarId} avatarUrl={req.avatarUrl} size={44} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">{req.name}</p>
                       <p className="font-mono text-xs text-subtle">{req.friendCode}</p>
@@ -178,7 +183,7 @@ function FriendsInner() {
               <ul className="mt-2 space-y-2">
                 {home.outgoing.map((req) => (
                   <li key={req.id} className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-3">
-                    <PlayerAvatar avatarId={req.avatarId} size={44} />
+                    <PlayerAvatar avatarId={req.avatarId} avatarUrl={req.avatarUrl} size={44} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">{req.name}</p>
                       <p className="text-xs text-muted-foreground">已送出邀請</p>
@@ -208,7 +213,7 @@ function FriendsInner() {
                       <span className="w-6 text-center font-display text-lg tabular-nums text-muted-foreground">{i + 1}</span>
                       <PlayerAvatar
                         avatarId={card.avatarId}
-                        avatarUrl={card.isSelf ? myAvatarUrl : undefined}
+                        avatarUrl={card.isSelf ? myAvatarUrl || card.avatarUrl : card.avatarUrl}
                         size={40}
                         trainingNow={card.trainingNow}
                       />
