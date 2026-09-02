@@ -4,7 +4,7 @@ import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AppShell } from "@/components/app-shell";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "鐵階 IRON RANK";
+const APP_NAME = "gym撚天地";
 
 export const Route = createRootRoute({
   head: () => ({

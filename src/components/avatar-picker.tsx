@@ -1,35 +1,38 @@
-import { PlayerAvatar } from "@/components/player-avatar";
-import { AVATARS } from "@/data/avatars";
-import { cn } from "@/lib/utils";
+import { UploadIcon } from "@/components/upload-icon";
+import { useGymStore } from "@/lib/store";
 
+/** 用家自己上傳頭像，唔再用預設圖示包。 */
 export function AvatarPicker({
   value,
   onChange,
 }: {
-  value: string;
-  onChange: (id: string) => void;
+  value?: string | null;
+  onChange: (url: string | null) => void;
 }) {
+  const setCustomIcon = useGymStore((s) => s.setCustomIcon);
+  const profile = useGymStore((s) => s.profile);
+  const stored = useGymStore((s) => s.customIcons.avatar);
+  const src = value || profile.avatarUrl || stored;
+
   return (
-    <div className="grid grid-cols-4 gap-2">
-      {AVATARS.map((a) => {
-        const on = value === a.id;
-        return (
-          <button
-            key={a.id}
-            type="button"
-            onClick={() => onChange(a.id)}
-            className={cn(
-              "flex flex-col items-center gap-1 rounded-lg border px-1 py-2 transition-colors duration-150",
-              on ? "border-accent bg-elevated" : "border-border bg-card",
-            )}
-            aria-label={a.nameZh}
-            aria-pressed={on}
-          >
-            <PlayerAvatar avatarId={a.id} size={44} />
-            <span className="text-xs text-muted-foreground">{a.nameZh}</span>
-          </button>
-        );
-      })}
+    <div className="flex items-center gap-3">
+      <UploadIcon
+        src={src}
+        size={72}
+        editable
+        rounded="full"
+        label="上傳頭像"
+        onChange={(next) => {
+          setCustomIcon("avatar", null, next);
+          onChange(next);
+        }}
+        fallback={
+          <span className="font-display text-lg text-muted-foreground">
+            {(profile.name || "?").slice(0, 1)}
+          </span>
+        }
+      />
+      <p className="text-xs text-muted-foreground">撳圖上傳自己嘅頭像（JPG / PNG）</p>
     </div>
   );
 }

@@ -35,6 +35,13 @@ export type Profile = {
   bodyweight: number;
   onboarded: boolean;
   avatarId: string;
+  avatarUrl?: string;
+};
+
+export type CustomIcons = {
+  avatar?: string;
+  ranks: Record<string, string>;
+  exercises: Record<string, string>;
 };
 
 export type WorkoutSummary = {
