@@ -25,8 +25,9 @@ type GymState = {
   friendCode: string | null;
   customIcons: CustomIcons;
   setProfile: (patch: Partial<Profile>) => void;
+  /** 只支援用戶頭像／動作 icon；段位徽章為系統固定，唔接受上傳 */
   setCustomIcon: (
-    kind: "avatar" | "ranks" | "exercises",
+    kind: "avatar" | "exercises",
     id: string | null,
     dataUrl: string | null,
   ) => void;
@@ -156,10 +157,11 @@ export const useGymStore = create<GymState>()(
               profile: { ...s.profile, avatarUrl: dataUrl ?? undefined },
             };
           }
-          const bag = { ...(s.customIcons[kind] ?? {}) };
+          // exercises only（段位 ranks 已停用上傳）
+          const bag = { ...(s.customIcons.exercises ?? {}) };
           if (dataUrl && id) bag[id] = dataUrl;
           else if (id) delete bag[id];
-          return { customIcons: { ...s.customIcons, [kind]: bag } };
+          return { customIcons: { ...s.customIcons, exercises: bag, ranks: {} } };
         });
         bumpCloud();
       },
@@ -349,7 +351,8 @@ export const useGymStore = create<GymState>()(
           profile: { ...defaultProfile, ...p.profile },
           friendCode: p.friendCode ?? current.friendCode ?? null,
           customIcons: {
-            ranks: { ...emptyIcons.ranks, ...(p.customIcons?.ranks ?? {}) },
+            // 段位 icon 已固定，唔再讀取舊 ranks 上傳
+            ranks: {},
             exercises: { ...emptyIcons.exercises, ...(p.customIcons?.exercises ?? {}) },
             avatar: p.customIcons?.avatar ?? p.profile?.avatarUrl ?? current.customIcons?.avatar,
           },
