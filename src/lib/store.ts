@@ -5,6 +5,7 @@ import { DEFAULT_AVATAR_ID } from "@/data/avatars";
 import { completedSetCount, lastSetsFor, workoutVolume } from "@/lib/stats";
 import type {
   ActiveSession,
+  CustomIcons,
   Profile,
   SetLog,
   Workout,
@@ -22,7 +23,13 @@ type GymState = {
   session: ActiveSession | null;
   lastSummary: WorkoutSummary | null;
   friendCode: string | null;
+  customIcons: CustomIcons;
   setProfile: (patch: Partial<Profile>) => void;
+  setCustomIcon: (
+    kind: "avatar" | "ranks" | "exercises",
+    id: string | null,
+    dataUrl: string | null,
+  ) => void;
   setFriendCode: (code: string | null) => void;
   startSession: (name: string, exerciseIds?: string[]) => void;
   startTemplate: (templateId: string) => void;
@@ -43,7 +50,10 @@ const defaultProfile: Profile = {
   bodyweight: 70,
   onboarded: false,
   avatarId: DEFAULT_AVATAR_ID,
+  avatarUrl: undefined,
 };
+
+const emptyIcons: CustomIcons = { ranks: {}, exercises: {} };
 
 function emptySet(weight = 20, reps = 8): SetLog {
   return { id: uid(), weight, reps, done: false };
@@ -130,8 +140,27 @@ export const useGymStore = create<GymState>()(
       session: null,
       lastSummary: null,
       friendCode: null,
+      customIcons: emptyIcons,
       setProfile: (patch) => {
         set((s) => ({ profile: { ...s.profile, ...patch } }));
+        bumpCloud();
+      },
+      setCustomIcon: (kind, id, dataUrl) => {
+        set((s) => {
+          if (kind === "avatar") {
+            const next = { ...s.customIcons };
+            if (dataUrl) next.avatar = dataUrl;
+            else delete next.avatar;
+            return {
+              customIcons: next,
+              profile: { ...s.profile, avatarUrl: dataUrl ?? undefined },
+            };
+          }
+          const bag = { ...(s.customIcons[kind] ?? {}) };
+          if (dataUrl && id) bag[id] = dataUrl;
+          else if (id) delete bag[id];
+          return { customIcons: { ...s.customIcons, [kind]: bag } };
+        });
         bumpCloud();
       },
       setFriendCode: (code) => set({ friendCode: code }),
@@ -303,12 +332,13 @@ export const useGymStore = create<GymState>()(
           session: null,
           lastSummary: null,
           friendCode: null,
+          customIcons: emptyIcons,
         });
         void import("@/lib/sync").then((m) => m.wipeCloud());
       },
     }),
     {
-      name: "iron-rank-v1",
+      name: "gym-nan-v2",
       skipHydration: true,
       merge: (persisted, current) => {
         const p = persisted as Partial<GymState> | undefined;
@@ -318,6 +348,11 @@ export const useGymStore = create<GymState>()(
           ...p,
           profile: { ...defaultProfile, ...p.profile },
           friendCode: p.friendCode ?? current.friendCode ?? null,
+          customIcons: {
+            ranks: { ...emptyIcons.ranks, ...(p.customIcons?.ranks ?? {}) },
+            exercises: { ...emptyIcons.exercises, ...(p.customIcons?.exercises ?? {}) },
+            avatar: p.customIcons?.avatar ?? p.profile?.avatarUrl ?? current.customIcons?.avatar,
+          },
         };
       },
     },
