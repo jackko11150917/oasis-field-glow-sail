@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { getExercise, type MuscleGroup } from "@/data/exercises";
+import { UploadIcon } from "@/components/upload-icon";
+import { useGymStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const TINT: Record<MuscleGroup, string> = {
@@ -433,7 +435,7 @@ const EQUIP_FALLBACK: Record<string, string> = {
   bodyweight: "pushup",
 };
 
-export function ExerciseIcon({
+function GlyphFallback({
   id,
   size = 40,
   className,
@@ -473,5 +475,38 @@ export function ExerciseIcon({
         {glyph()}
       </svg>
     </span>
+  );
+}
+
+export function ExerciseIcon({
+  id,
+  size = 40,
+  className,
+  editable = false,
+}: {
+  id: string;
+  size?: number;
+  className?: string;
+  editable?: boolean;
+}) {
+  const src = useGymStore((s) => s.customIcons.exercises[id]);
+  const setCustomIcon = useGymStore((s) => s.setCustomIcon);
+  const label = getExercise(id)?.nameZh ?? id;
+
+  if (!editable && !src) {
+    return <GlyphFallback id={id} size={size} className={className} />;
+  }
+
+  return (
+    <UploadIcon
+      src={src}
+      size={size}
+      className={className}
+      rounded="lg"
+      editable={editable}
+      label={`上傳${label}圖示`}
+      onChange={editable ? (next) => setCustomIcon("exercises", id, next) : undefined}
+      fallback={<GlyphFallback id={id} size={size} />}
+    />
   );
 }
