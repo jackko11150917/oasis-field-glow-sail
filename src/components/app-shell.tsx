@@ -21,7 +21,7 @@ const TABS = [
 function BootScreen() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg items-center justify-center bg-background">
-      <p className="font-display text-2xl tracking-widest text-muted-foreground">IRON RANK</p>
+      <p className="font-display text-2xl tracking-widest text-muted-foreground">GYM</p>
     </div>
   );
 }

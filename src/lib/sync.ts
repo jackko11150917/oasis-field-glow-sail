@@ -26,11 +26,13 @@ export async function pullCloudState(): Promise<void> {
         profile: {
           ...remote.profile,
           avatarId: remote.profile.avatarId || local.profile.avatarId || "anvil",
+          avatarUrl: remote.profile.avatarUrl || local.profile.avatarUrl,
         },
         xp: remote.xp,
         workouts: remote.workouts,
         session: remote.session ?? local.session,
         friendCode: remote.friendCode ?? local.friendCode,
+        customIcons: remote.customIcons ?? local.customIcons,
       });
       return;
     }
@@ -46,6 +48,7 @@ export async function pullCloudState(): Promise<void> {
             local.xp,
             local.session,
           ),
+          customIcons: local.customIcons,
         },
       });
       if (local.workouts.length) {
@@ -68,7 +71,7 @@ export function scheduleCloudSave(): void {
 }
 
 export async function flushCloudSave(): Promise<void> {
-  const { profile, xp, session, workouts } = useGymStore.getState();
+  const { profile, xp, session, workouts, customIcons } = useGymStore.getState();
   if (!profile.onboarded) return;
   try {
     const res = await saveGymSnapshot({
@@ -77,6 +80,7 @@ export async function flushCloudSave(): Promise<void> {
         xp,
         session,
         publicStats: buildPublicStats(workouts, profile, xp, session),
+        customIcons,
       },
     });
     if (res?.friendCode) useGymStore.getState().setFriendCode(res.friendCode);
