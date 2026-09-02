@@ -27,6 +27,7 @@ function FriendsPage() {
 
 function FriendsInner() {
   const localCode = useGymStore((s) => s.friendCode);
+  const myAvatarUrl = useGymStore((s) => s.profile.avatarUrl);
   const [home, setHome] = useState<FriendsHome | null>(null);
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
@@ -121,7 +122,7 @@ function FriendsInner() {
         <p className="text-xs text-muted-foreground">你嘅好友 ID</p>
         <div className="mt-2 flex items-center gap-3">
           {me ? (
-            <PlayerAvatar avatarId={me.avatarId} size={52} trainingNow={me.trainingNow} />
+            <PlayerAvatar avatarId={me.avatarId} avatarUrl={myAvatarUrl} size={52} trainingNow={me.trainingNow} />
           ) : (
             <div className="size-12 rounded-full bg-elevated" />
           )}
@@ -205,7 +206,12 @@ function FriendsInner() {
                       )}
                     >
                       <span className="w-6 text-center font-display text-lg tabular-nums text-muted-foreground">{i + 1}</span>
-                      <PlayerAvatar avatarId={card.avatarId} size={40} trainingNow={card.trainingNow} />
+                      <PlayerAvatar
+                        avatarId={card.avatarId}
+                        avatarUrl={card.isSelf ? myAvatarUrl : undefined}
+                        size={40}
+                        trainingNow={card.trainingNow}
+                      />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">
                           {card.name}
