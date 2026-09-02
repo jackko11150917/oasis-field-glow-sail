@@ -1,11 +1,24 @@
 import { useId } from "react";
-import { UploadIcon } from "@/components/upload-icon";
 import type { RankDef, RankTier } from "@/data/ranks";
-import { useGymStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 function medalColor(rank: RankDef) {
   return `var(--color-${rank.token})`;
+}
+
+/** 段位徽章：系統固定 SVG（銅／銀／金等），唔支援用家上傳 */
+export function RankEmblem({
+  rank,
+  size = 88,
+  className,
+}: {
+  rank: RankDef;
+  size?: number;
+  className?: string;
+  /** @deprecated 已移除；段位 icon 唔再接受上傳 */
+  editable?: boolean;
+}) {
+  return <RankSvg rank={rank} size={size} className={className} />;
 }
 
 function RankSvg({
@@ -41,43 +54,6 @@ function RankSvg({
       </defs>
       {unranked ? <UnrankedMark color={color} /> : <MedalBody rank={rank} color={color} gid={`g-${raw}`} hid={`h-${raw}`} />}
     </svg>
-  );
-}
-
-export function RankEmblem({
-  rank,
-  size = 88,
-  className,
-  editable = false,
-}: {
-  rank: RankDef;
-  size?: number;
-  className?: string;
-  editable?: boolean;
-}) {
-  const key = rank.tier;
-  const src = useGymStore((s) => s.customIcons.ranks[key] || s.customIcons.ranks[rank.id]);
-  const setCustomIcon = useGymStore((s) => s.setCustomIcon);
-
-  if (!editable && !src) {
-    return <RankSvg rank={rank} size={size} className={className} />;
-  }
-
-  return (
-    <UploadIcon
-      src={src}
-      size={size}
-      className={className}
-      rounded="lg"
-      editable={editable}
-      label={`上傳${rank.tierZh}圖示`}
-      onChange={
-        editable
-          ? (next) => setCustomIcon("ranks", key, next)
-          : undefined
-      }
-      fallback={<RankSvg rank={rank} size={size} />}
-    />
   );
 }
 
