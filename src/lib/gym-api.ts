@@ -3,7 +3,7 @@ import { authMiddleware } from "@/lib/auth/middleware";
 import { getSql } from "@/lib/db";
 import { ensureFriendCode } from "@/lib/ensure-friend-code";
 import { generateFriendCode } from "@/lib/friend-code";
-import type { ActiveSession, Profile, PublicStats, Workout } from "@/lib/types";
+import type { ActiveSession, CustomIcons, Profile, PublicStats, Workout } from "@/lib/types";
 
 export type CloudGymState = {
   profile: Profile | null;
@@ -11,6 +11,7 @@ export type CloudGymState = {
   workouts: Workout[];
   session: ActiveSession | null;
   friendCode: string | null;
+  customIcons: CustomIcons;
 };
 
 type ProfileRow = {
@@ -21,8 +22,23 @@ type ProfileRow = {
   xp: number;
   session_json: string | null;
   avatar_id: string | null;
+  avatar_url: string | null;
+  icons_json: string | null;
   friend_code: string | null;
 };
+
+function emptyIcons(): CustomIcons {
+  return { ranks: {}, exercises: {} };
+}
+
+function toIcons(raw: string | null): CustomIcons {
+  const parsed = parseJson<Partial<CustomIcons>>(raw, {});
+  return {
+    avatar: parsed.avatar,
+    ranks: parsed.ranks ?? {},
+    exercises: parsed.exercises ?? {},
+  };
+}
 
 type WorkoutRow = {
   id: string;
@@ -51,6 +67,7 @@ function toProfile(row: ProfileRow): Profile {
     bodyweight: Number(row.bodyweight) || 70,
     onboarded: Boolean(row.onboarded),
     avatarId: row.avatar_id || "anvil",
+    avatarUrl: row.avatar_url || undefined,
   };
 }
 
@@ -72,7 +89,7 @@ export const loadGymState = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<CloudGymState> => {
     const sql = await getSql();
     const profiles = await sql<ProfileRow>`
-      select name, sex, bodyweight, onboarded, xp, session_json, avatar_id, friend_code
+      select name, sex, bodyweight, onboarded, xp, session_json, avatar_id, avatar_url, icons_json, friend_code
       from gym_profiles
       where user_id = ${context.userId}
     `;
@@ -92,6 +109,7 @@ export const loadGymState = createServerFn({ method: "GET" })
       workouts: workouts.map(toWorkout),
       session: row ? parseJson<ActiveSession | null>(row.session_json, null) : null,
       friendCode: friendCode ?? row?.friend_code ?? null,
+      customIcons: row ? toIcons(row.icons_json) : emptyIcons(),
     };
   });
 
@@ -103,6 +121,7 @@ export const saveGymSnapshot = createServerFn({ method: "POST" })
       xp: number;
       session: ActiveSession | null;
       publicStats: PublicStats;
+      customIcons?: CustomIcons;
     }) => d,
   )
   .handler(async ({ context, data }) => {
@@ -112,10 +131,12 @@ export const saveGymSnapshot = createServerFn({ method: "POST" })
     const friendCode = existingCode ?? generateFriendCode();
     const stats = data.publicStats;
     const avatarId = data.profile.avatarId || "anvil";
+    const avatarUrl = data.profile.avatarUrl || data.customIcons?.avatar || null;
+    const iconsJson = JSON.stringify(data.customIcons ?? emptyIcons());
     await sql`
       insert into gym_profiles (
         user_id, name, sex, bodyweight, onboarded, xp, session_json,
-        avatar_id, friend_code, level, rank_id, rank_percentile,
+        avatar_id, avatar_url, icons_json, friend_code, level, rank_id, rank_percentile,
         streak, week_days, week_xp, workout_count, last_trained_at, training_now, updated_at
       )
       values (
@@ -127,6 +148,8 @@ export const saveGymSnapshot = createServerFn({ method: "POST" })
         ${data.xp},
         ${sessionJson},
         ${avatarId},
+        ${avatarUrl},
+        ${iconsJson},
         ${friendCode},
         ${stats.level},
         ${stats.rankId},
@@ -147,6 +170,8 @@ export const saveGymSnapshot = createServerFn({ method: "POST" })
         xp = excluded.xp,
         session_json = excluded.session_json,
         avatar_id = excluded.avatar_id,
+        avatar_url = excluded.avatar_url,
+        icons_json = excluded.icons_json,
         friend_code = coalesce(gym_profiles.friend_code, excluded.friend_code),
         level = excluded.level,
         rank_id = excluded.rank_id,
