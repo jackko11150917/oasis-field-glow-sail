@@ -31,7 +31,7 @@ function RankInner() {
       <h1 className="mt-1 font-display text-4xl tracking-wide">段位</h1>
 
       <div className="mt-5 rounded-xl border border-border bg-card p-5 text-center">
-        <RankEmblem rank={overall.rank} size={120} className="mx-auto" editable />
+        <RankEmblem rank={overall.rank} size={120} className="mx-auto" />
         <p className="mt-3 font-display text-4xl tracking-wide">{overall.rank.nameZh}</p>
         <p className="text-xs tracking-widest text-muted-foreground">{overall.rank.nameEn}</p>
         {overall.counted ? (
@@ -62,7 +62,7 @@ function RankInner() {
       <section className="mt-6">
         <h2 className="text-sm font-medium">段位一覽</h2>
         <p className="mt-1 text-xs text-subtle">
-          黑鐵至鑽石各分 3、2、1，1 為該階最高。大師同宗師無分段。撳徽章可上傳自己嘅段位 logo。
+          黑鐵至鑽石各分 3、2、1，1 為該階最高。大師同宗師無分段。
         </p>
         <ul className="mt-3 space-y-2">
           {TIER_GROUPS.map((g) => {
@@ -75,7 +75,7 @@ function RankInner() {
                   active ? "border-accent/40" : "border-border",
                 )}
               >
-                <RankEmblem rank={g.emblem} size={48} editable />
+                <RankEmblem rank={g.emblem} size={48} />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{g.nameZh}</p>
                   <p className="text-xs tracking-widest text-subtle">{g.nameEn}</p>
