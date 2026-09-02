@@ -63,7 +63,12 @@ function HomeInner() {
       <header className="flex items-start justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <Link to="/profile" aria-label="檔案">
-            <PlayerAvatar avatarId={profile.avatarId || "anvil"} size={48} trainingNow={Boolean(session)} />
+            <PlayerAvatar
+              avatarId={profile.avatarId || "anvil"}
+              avatarUrl={profile.avatarUrl}
+              size={48}
+              trainingNow={Boolean(session)}
+            />
           </Link>
           <div className="min-w-0">
             <p className="text-xs tracking-widest text-muted-foreground">IRON RANK</p>
@@ -167,7 +172,12 @@ function HomeInner() {
               {topSquad.map((card, i) => (
                 <li key={card.friendCode} className="flex items-center gap-2 text-sm">
                   <span className="w-4 text-xs tabular-nums text-subtle">{i + 1}</span>
-                  <PlayerAvatar avatarId={card.avatarId} size={28} trainingNow={card.trainingNow} />
+                  <PlayerAvatar
+                    avatarId={card.avatarId}
+                    avatarUrl={card.isSelf ? profile.avatarUrl : undefined}
+                    size={28}
+                    trainingNow={card.trainingNow}
+                  />
                   <span className="min-w-0 flex-1 truncate">
                     {card.name}
                     {card.isSelf ? "（你）" : ""}
