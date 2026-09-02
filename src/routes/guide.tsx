@@ -5,11 +5,18 @@ import { ExerciseIcon } from "@/components/exercise-icon";
 import { Input } from "@/components/ui/input";
 import {
   EQUIPMENT_LABELS,
-  EXERCISES,
+  EXERCISES as BASE_EXERCISES,
   MUSCLE_LABELS,
+  type Exercise,
   type MuscleGroup,
 } from "@/data/exercises";
+import { MACHINE_EXERCISES } from "@/data/machine-exercises";
 import { cn } from "@/lib/utils";
+
+const EXERCISES: Exercise[] = [
+  ...BASE_EXERCISES,
+  ...(MACHINE_EXERCISES as unknown as Exercise[]),
+];
 
 export const Route = createFileRoute("/guide")({ component: GuidePage });
 
